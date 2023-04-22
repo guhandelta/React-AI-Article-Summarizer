@@ -28,7 +28,19 @@ export const articleApi = createApi({
     enpoints can be mentioned/specified */
     endpoints: (builder) => ({
         getSummary: builder.query({
-            query: (params) => `test`
+            /*length => length of the paragraphs
+            encodeURIComponent() => Encodes a text string as a valid component of a Uniform Resource Identifier (URI). It is best to wrap the URL with this fn() while passing user generated content, as the URI may contain any special characters, which may cause any errors.
+            */
+            query: (params) => 
+            `/summarize?url=${encodeURIComponent(params.articleUrl)}&length=3`
         })
     })
 })
+
+/*
+Redux Toolkit Query generates a hook useGetSummaryQuery, automatically, out of the endpoint
+
+useGetSummaryQuery => would call this endpoint immediately(once the page/app loads) at the start
+useLazyGetSummaryQuery => allows to fire teh hook on demand, post submit 
+*/
+export const { useLazyGetSummaryQuery } = articleApi;
