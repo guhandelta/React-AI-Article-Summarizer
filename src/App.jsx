@@ -1,10 +1,18 @@
-import React from 'react'
+import { Demo, Hero } from './components'
+
+import './app.css'
 
 const App = () => {
   return (
-    <div>
-        <h1>App</h1>
-    </div>
+    <main>
+        <div className="main">
+            <div className="gradient" />
+        </div>
+        <div className="app">
+            <Hero />
+            <Demo />
+        </div>
+    </main>
   )
 }
 
