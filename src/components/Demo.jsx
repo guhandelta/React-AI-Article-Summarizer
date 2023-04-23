@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 
 import { copy, linkIcon, loader, tick } from '../assets'
+import { useLazyGetSummaryQuery } from '../services/article';
 
 const Demo = () => {
 
@@ -9,8 +10,28 @@ const Demo = () => {
         summary: ""
     });
 
-    const handleSubmit = async () => {
-        alert("Submitted!");
+    /* fn() to fetch the summary on btn click, check error and fetching state */
+    const [ getSummary, { error, isFetching } ] = useLazyGetSummaryQuery();
+
+    const handleSubmit = async (e) => {
+        // preventDefault is called on the event when submitting the form to prevent a browser reload/refresh
+        e.preventDefault();
+
+        const { data } = await getSummary({ articleUrl: article.url });
+
+        //If the response has a summary
+        if(data?.summary){
+            const newArticle = { ...article, summary: data.summary };
+
+            setArticle(newArticle);
+            console.log(newArticle);
+        }else{
+            console.log("Something's not right!!");
+        }
+
+        if(error){
+            console.log("Error:\t", error);
+        }
     }
 
   return (
@@ -18,7 +39,7 @@ const Demo = () => {
         <div className="flex flex-col w-full gap-2">
             <form 
                 className="relative flex justify-center items-center"
-                onSubmit={() => {handleSubmit}}
+                onSubmit={handleSubmit}
             >
                 <img 
                     src={linkIcon} 
