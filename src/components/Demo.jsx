@@ -9,9 +9,21 @@ const Demo = () => {
         url: "",
         summary: ""
     });
+    const [allArticles, setAllArticles] = useState([]);
 
     /* fn() to fetch the summary on btn click, check error and fetching state */
     const [ getSummary, { error, isFetching } ] = useLazyGetSummaryQuery();
+
+    useEffect(()=>{
+        // Fetching the articles from the local storage
+        const articlesFromLocalStorage = JSON.parse(localStorage.getItem('articles'));
+
+        if(articlesFromLocalStorage){
+            setAllArticles(articlesFromLocalStorage);
+        }
+    },[]);
+
+    allArticles.map(a => console.log("url:\t", a.url));
 
     const handleSubmit = async (e) => {
         // preventDefault is called on the event when submitting the form to prevent a browser reload/refresh
@@ -22,16 +34,26 @@ const Demo = () => {
         //If the response has a summary
         if(data?.summary){
             const newArticle = { ...article, summary: data.summary };
+            const updatedAllArticles = [newArticle, ...allArticles]
 
             setArticle(newArticle);
-            console.log(newArticle);
+            console.log(article);
+            // Pushing the newArticle into the array of articles 
+            setAllArticles(updatedAllArticles);
+            console.log(allArticles);
+
+            /* Storing the updated list of articles in the local storage
+            JSON.stringify() => Local storage can contain only strings*/
+            localStorage.setItem('articles', JSON.stringify(updatedAllArticles));
+
+            
         }else{
             console.log("Something's not right!!");
+            if(error || data.error){
+                console.log("Error:\t", error);
+            }
         }
 
-        if(error){
-            console.log("Error:\t", error);
-        }
     }
 
   return (
@@ -68,6 +90,26 @@ const Demo = () => {
                 </button>
             </form>
             {/*Browse URL History*/}
+            <div className="flex flex-col gap-1 max-h-60 overflow-y-auto">
+                {allArticles.map((item, index) =>(
+                    <div 
+                        key={`link-${index}`}
+                        onClick={() => setArticle(item)}
+                        className="link_card"
+                    >
+                        <div className="copy_btn">
+                            <img
+                                src={copy}
+                                alt="copy_icon"
+                                className="w-[40%] h-[40%] object-contain" 
+                            />
+                        </div>
+                        <p className="flex-1 font-satoshi text-blue-700 font-medium text-sm truncate">
+                            {item.url}
+                        </p>
+                    </div>
+                ))}
+            </div>
         </div>
         {/*Results of the Summarize operation*/}
     </section>
